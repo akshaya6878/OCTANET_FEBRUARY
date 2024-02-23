@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced To-Do App</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #98c4fd;
+        margin: 0;
+        padding: 0;
+    }
+    .center-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        max-width: 600px;
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    .add-task-form {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    .add-task-form input[type="text"],
+    .add-task-form select,
+    .add-task-form input[type="datetime-local"] {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-right: 10px;
+    }
+    .add-task-form button {
+        padding: 10px 20px;
+        border: none;
+        background-color: #98c4fd;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .add-task-form button:hover {
+        background-color: #45a049;
+    }
+    .task {
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(to right, #fff 50%, #e7f6e9 50%);
+    }
+    .task:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    .task input[type="checkbox"] {
+        margin-right: 10px;
+    }
+    .task-details {
+        flex-grow: 1;
+    }
+    .task-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    .task-metadata {
+        font-size: 14px;
+        color: #666;
+    }
+    .priority-high {
+        color: #ff5722;
+    }
+    .priority-medium {
+        color: #ffc107;
+    }
+    .priority-low {
+        color: #4caf50;
+    }
+    .delete-btn {
+        padding: 5px 10px;
+        border: none;
+        background-color: #f44336;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .delete-btn:hover {
+        background-color: #d32f2f;
+    }
+</style>
+</head>
+<body>
+<div class="center-container">
+    <div class="container">
+        <h1>Advanced To-Do App</h1>
+        <div class="add-task-form">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <select id="prioritySelect">
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
+            </select>
+            <input type="datetime-local" id="taskTime">
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <div id="taskList"></div>
+    </div>
+</div>
+
+<script>
+    function addTask() {
+        var input = document.getElementById("taskInput");
+        var priority = document.getElementById("prioritySelect").value;
+        var time = document.getElementById("taskTime").value;
+        var task = input.value;
+        if (task.trim() !== "") {
+            var taskList = document.getElementById("taskList");
+            var taskElement = document.createElement("div");
+            taskElement.className = "task";
+            var taskDetails = document.createElement("div");
+            taskDetails.className = "task-details";
+            var taskTitle = document.createElement("div");
+            taskTitle.className = "task-title";
+            taskTitle.textContent = task;
+            var taskMetadata = document.createElement("div");
+            taskMetadata.className = "task-metadata";
+            taskMetadata.textContent = "Priority: " + priority.charAt(0).toUpperCase() + priority.slice(1) + " | Due: " + time;
+            taskDetails.appendChild(taskTitle);
+            taskDetails.appendChild(taskMetadata);
+            var deleteButton = document.createElement("button");
+            deleteButton.className = "delete-btn";
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = function() {
+                taskElement.remove();
+            };
+            taskElement.appendChild(taskDetails);
+            taskElement.appendChild(deleteButton);
+            taskList.appendChild(taskElement);
+            sortTasksByTime();
+            setReminder(task, time);
+            input.value = "";
+        } else {
+            alert("Please enter a task!");
+        }
+    }
+
+    function sortTasksByTime() {
+        var taskList = document.getElementById("taskList");
+        var tasks = taskList.getElementsByClassName("task");
+        var tasksArray = Array.from(tasks);
+        tasksArray.sort(function(a, b) {
+            var timeA = new Date(a.getElementsByClassName("task-metadata")[0].textContent.split("Due: ")[1]);
+            var timeB = new Date(b.getElementsByClassName("task-metadata")[0].textContent.split("Due: ")[1]);
+            return timeA - timeB;
+        });
+        taskList.innerHTML = "";
+        tasksArray.forEach(function(task) {
+            taskList.appendChild(task);
+        });
+    }
+
+    function setReminder(task, time) {
+        var dueTime = new Date(time).getTime();
+        var now = new Date().getTime();
+        var timeUntilDue = dueTime - now;
+        if (timeUntilDue > 0) {
+            setTimeout(function() {
+                alert("Reminder: Task '" + task + "' is due now!");
+            }, timeUntilDue);
+        }
+    }
+</script>
+</body>
+</html>
